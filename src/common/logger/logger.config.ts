@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { WinstonModuleOptions } from 'nest-winston';
 import * as winston from 'winston';
-import { LOG_MAX_SIZE, LOG_MAX_FILES } from '@/common/constants/logger';
+import { LOG_MAX_SIZE, LOG_MAX_FILES } from '@/common/constants';
 import 'winston-daily-rotate-file';
 
 export const createLoggerConfig = (

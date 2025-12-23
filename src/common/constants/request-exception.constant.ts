@@ -1,5 +1,9 @@
 import { HttpStatus } from '@nestjs/common';
 
+/**
+ * 请求异常消息映射
+ * 当用户没有提供自定义消息时，NestJS 会使用这些默认消息
+ */
 export const REQUEST_EXCEPTION_MESSAGE: Record<number, string> = {
   [HttpStatus.BAD_REQUEST]: '请求错误', // 400
   [HttpStatus.UNAUTHORIZED]: '登录已过期，请重新登录',

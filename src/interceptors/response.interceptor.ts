@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Response } from 'express';
 import { IResponse } from '@/interface/response.interface';
-import { formatDateTime } from '@/utils/date.util';
+import { formatDateTime } from '@/utils';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
