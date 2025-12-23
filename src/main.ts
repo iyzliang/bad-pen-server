@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { BadRequestFilter } from '@/filters/bad-request.filter';
 import { LoggerService } from '@/common/logger/logger.service';
+import { ResponseInterceptor } from '@/interceptors/response.interceptor';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -22,6 +23,9 @@ async function bootstrap() {
 
   // 注册全局异常过滤器
   app.useGlobalFilters(new BadRequestFilter(loggerService));
+
+  // 注册全局响应拦截器
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   const port = configService.get<number>('PORT') ?? 3000;
   const cors = configService.get('CORS') === 'true';

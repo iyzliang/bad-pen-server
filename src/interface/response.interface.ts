@@ -1,5 +1,5 @@
 /**
- * 异常响应接口
+ * 响应接口
  */
 export interface IResponse<T = null> {
   code: number;
