@@ -1,4 +1,3 @@
-import { VersioningType, VERSION_NEUTRAL } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -30,25 +29,14 @@ async function bootstrap() {
   const port = configService.get<number>('PORT') ?? 3000;
   const cors = configService.get('CORS') === 'true';
   const prefix = configService.get<string>('PREFIX') ?? '/api';
-  const versionStr = configService.get<string>('VERSION') ?? '1';
-
-  const version = versionStr.indexOf(',')
-    ? versionStr.split(',')
-    : [versionStr];
 
   app.setGlobalPrefix(prefix);
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: typeof version === 'undefined' ? VERSION_NEUTRAL : version,
-  });
 
   if (cors) {
     app.enableCors();
   }
 
   await app.listen(port);
-  winstonLogger.log(
-    `🚀 ${appName} 已启动: http://localhost:${port}${prefix}/v${version[0]}`,
-  );
+  winstonLogger.log(`🚀 ${appName} 已启动: http://localhost:${port}${prefix}`);
 }
 bootstrap();
