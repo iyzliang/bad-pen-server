@@ -1,7 +1,12 @@
 import { Controller, Get, Post, Query, Body, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService, CaptchaService, EmailService } from '../services';
-import { CaptchaDto, CaptchaQueryDto, EmailVerifyBodyDto } from '../dtos';
+import {
+  CaptchaDto,
+  CaptchaQueryDto,
+  EmailVerifyBodyDto,
+  RegisterBodyDto,
+} from '../dtos';
 
 @Controller('admin/auth')
 @ApiTags('认证管理模块')
@@ -43,5 +48,19 @@ export class AuthController {
     @Body() sendEmailVerifyDto: EmailVerifyBodyDto,
   ): Promise<void> {
     await this.emailService.sendEmailVerify(sendEmailVerifyDto);
+  }
+
+  @Post('register')
+  @ApiOperation({ summary: '注册' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: '注册成功',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: '注册失败, 请稍后重试',
+  })
+  async register(@Body() registerBodyDto: RegisterBodyDto): Promise<void> {
+    await this.authService.register(registerBodyDto);
   }
 }

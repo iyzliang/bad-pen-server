@@ -8,7 +8,7 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Response } from 'express';
-import { IResponse } from '@/interface/response.interface';
+import { IResponse } from '@/interface';
 import { formatDateTime } from '@/utils';
 
 @Injectable()

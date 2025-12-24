@@ -6,7 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
-import { IResponse } from '@/interface/response.interface';
+import { IResponse } from '@/interface';
 import { formatDateTime } from '@/utils';
 import { LoggerService } from '@/common/logger/logger.service';
 import {
