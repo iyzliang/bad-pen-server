@@ -9,7 +9,14 @@ import { EMAIL_VERIFY_PREFIX } from '@/common/constants';
 import { JwtService } from '@/common/jwt/jwt.service';
 import { hashPassword, comparePassword } from '@/utils';
 import { CaptchaService } from './captcha.service';
-import { RegisterBodyDto, LoginDto, CaptchaType, LoginBodyDto } from '../dtos';
+import {
+  RegisterBodyDto,
+  LoginDto,
+  CaptchaType,
+  LoginBodyDto,
+  RefreshTokenBodyDto,
+  AccessTokenDto,
+} from '../dtos';
 
 @Injectable()
 export class AuthService {
@@ -70,6 +77,21 @@ export class AuthService {
     return new LoginDto({
       ...user,
       ...tokens,
+    });
+  }
+
+  /**
+   * 刷新令牌
+   * @param refreshTokenBodyDto 刷新令牌信息
+   */
+  async refreshToken(
+    refreshTokenBodyDto: RefreshTokenBodyDto,
+  ): Promise<AccessTokenDto> {
+    const { refreshToken } = refreshTokenBodyDto;
+    const payload = await this.jwtService.verifyRefreshToken(refreshToken);
+    const accessTokenDto = this.jwtService.generateAccessToken(payload);
+    return new AccessTokenDto({
+      ...accessTokenDto,
     });
   }
 

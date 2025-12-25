@@ -1,9 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService as NestJwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from '@/interface';
-import { JWT_EXPIRES_IN, JWT_REFRESH_EXPIRES_IN } from '@/common/constants';
-import { TokenDto } from '@/admin/auth/dtos';
+import {
+  JWT_EXPIRES_IN,
+  JWT_REFRESH_EXPIRES_IN,
+  JWT_REFRESH_REDIS_PREFIX,
+} from '@/common/constants';
+import { AccessTokenDto, RefreshTokenDto, TokenDto } from '@/admin/auth/dtos';
+import { RedisService } from '../redis/redis.service';
 
 /**
  * JWT 服务
@@ -14,21 +19,27 @@ export class JwtService {
   constructor(
     private readonly jwtService: NestJwtService,
     private readonly configService: ConfigService,
+    private readonly redisService: RedisService,
   ) {}
 
-  generateAccessToken(payload: JwtPayload): string {
+  generateAccessToken(payload: JwtPayload): AccessTokenDto {
     const secret = this.configService.get<string>('JWT_SECRET');
     if (!secret) {
       throw new Error('JWT_SECRET 未配置');
     }
 
-    return this.jwtService.sign(payload, {
+    const accessToken = this.jwtService.sign(payload, {
       secret,
+      expiresIn: JWT_EXPIRES_IN,
+    });
+
+    return new AccessTokenDto({
+      accessToken,
       expiresIn: JWT_EXPIRES_IN,
     });
   }
 
-  generateRefreshToken(payload: JwtPayload): string {
+  generateRefreshToken(payload: JwtPayload): RefreshTokenDto {
     const refreshSecret =
       this.configService.get<string>('JWT_REFRESH_SECRET') ||
       this.configService.get<string>('JWT_SECRET');
@@ -37,34 +48,31 @@ export class JwtService {
       throw new Error('JWT_SECRET 或 JWT_REFRESH_SECRET 未配置');
     }
 
-    return this.jwtService.sign(payload, {
+    const refreshToken = this.jwtService.sign(payload, {
       secret: refreshSecret,
       expiresIn: JWT_REFRESH_EXPIRES_IN,
+    });
+    this.redisService.set(
+      `${JWT_REFRESH_REDIS_PREFIX}:${payload.sub}`,
+      refreshToken,
+      JWT_REFRESH_EXPIRES_IN,
+    );
+    return new RefreshTokenDto({
+      refreshToken,
     });
   }
 
   async generateTokens(payload: JwtPayload): Promise<TokenDto> {
-    const accessToken = this.generateAccessToken(payload);
-    const refreshToken = this.generateRefreshToken(payload);
+    const accessTokenDto = this.generateAccessToken(payload);
+    const refreshTokenDto = this.generateRefreshToken(payload);
 
-    return {
-      accessToken,
-      refreshToken,
-      expiresIn: JWT_EXPIRES_IN,
-    };
-  }
-
-  verifyAccessToken(token: string): JwtPayload {
-    const secret = this.configService.get<string>('JWT_SECRET');
-    if (!secret) {
-      throw new Error('JWT_SECRET 未配置');
-    }
-    return this.jwtService.verify<JwtPayload>(token, {
-      secret, // 显式传入 secret 进行验证
+    return new TokenDto({
+      ...accessTokenDto,
+      ...refreshTokenDto,
     });
   }
 
-  verifyRefreshToken(token: string): JwtPayload {
+  async verifyRefreshToken(token: string): Promise<JwtPayload> {
     const refreshSecret =
       this.configService.get<string>('JWT_REFRESH_SECRET') ||
       this.configService.get<string>('JWT_SECRET');
@@ -73,8 +81,21 @@ export class JwtService {
       throw new Error('JWT_SECRET 或 JWT_REFRESH_SECRET 未配置');
     }
 
-    return this.jwtService.verify<JwtPayload>(token, {
-      secret: refreshSecret, // 显式传入 secret 进行验证
+    const payload = this.jwtService.verify<JwtPayload>(token, {
+      secret: refreshSecret,
     });
+    if (!payload) {
+      throw new UnauthorizedException('刷新令牌无效');
+    }
+    const refreshTokenRedisKey = `${JWT_REFRESH_REDIS_PREFIX}:${payload.sub}`;
+    const storedRefreshToken =
+      await this.redisService.get(refreshTokenRedisKey);
+    if (!storedRefreshToken) {
+      throw new UnauthorizedException('刷新令牌已过期');
+    }
+    if (storedRefreshToken !== token) {
+      throw new UnauthorizedException('刷新令牌无效');
+    }
+    return payload;
   }
 }

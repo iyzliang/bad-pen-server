@@ -9,6 +9,8 @@ import {
   RegisterBodyDto,
   LoginDto,
   LoginBodyDto,
+  RefreshTokenBodyDto,
+  AccessTokenDto,
 } from '../dtos';
 
 @Controller('admin/auth')
@@ -85,5 +87,23 @@ export class AuthController {
   })
   async login(@Body() loginBodyDto: LoginBodyDto): Promise<LoginDto> {
     return await this.authService.login(loginBodyDto);
+  }
+
+  @Public()
+  @Post('refresh-token')
+  @ApiOperation({ summary: '刷新令牌' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '刷新令牌成功',
+    type: AccessTokenDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '刷新令牌失败, 请稍后重试',
+  })
+  async refreshToken(
+    @Body() refreshTokenBodyDto: RefreshTokenBodyDto,
+  ): Promise<AccessTokenDto> {
+    return await this.authService.refreshToken(refreshTokenBodyDto);
   }
 }
