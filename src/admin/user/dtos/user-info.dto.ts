@@ -1,10 +1,9 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { formatDateTime } from '@/utils';
-import { TokenDto } from './token.dto';
-import { UserEntity } from '../../user/entities';
+import { UserEntity } from '../entities';
 
-export class LoginDto extends TokenDto {
+export class UserInfoDto {
   @ApiProperty({ description: '用户ID', example: 'uuid' })
   @IsString({ message: '用户ID格式不正确' })
   @IsNotEmpty({ message: '用户ID不能为空' })
@@ -38,8 +37,7 @@ export class LoginDto extends TokenDto {
   @IsNotEmpty({ message: '上次密码更新时间不能为空' })
   lastPasswordUpdatedAt: string;
 
-  constructor(data: UserEntity & TokenDto) {
-    super(data);
+  constructor(data: UserEntity) {
     this.userId = data.id;
     this.email = data.email;
     this.username = data.username ?? '';

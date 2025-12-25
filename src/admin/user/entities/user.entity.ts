@@ -26,6 +26,9 @@ export class UserEntity {
   @Column({ nullable: true })
   bio: string; // 个人简介
 
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  lastPasswordUpdatedAt: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 

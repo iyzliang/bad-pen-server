@@ -30,7 +30,7 @@ export class AuthService {
    * 用户注册
    * @param registerBodyDto 注册信息
    */
-  async register(registerBodyDto: RegisterBodyDto): Promise<LoginDto> {
+  async register(registerBodyDto: RegisterBodyDto) {
     const { email, password, emailVerifyCode, code, captchaId } =
       registerBodyDto;
 
@@ -48,14 +48,9 @@ export class AuthService {
     const hashedPassword = hashPassword(password);
 
     // 4. 创建用户
-    const user = await this.userRepository.create({
+    await this.userRepository.create({
       email,
       password: hashedPassword,
-    });
-    const tokens = await this.jwtService.generateTokens({ sub: user.id });
-    return new LoginDto({
-      ...user,
-      ...tokens,
     });
   }
 

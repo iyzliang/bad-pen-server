@@ -47,6 +47,7 @@ export class UserRepository {
         'username',
         'avatar',
         'bio',
+        'lastPasswordUpdatedAt',
         'createdAt',
         'updatedAt',
       ],

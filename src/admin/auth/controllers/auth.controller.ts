@@ -63,14 +63,13 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: '注册成功',
-    type: LoginDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: '注册失败, 请稍后重试',
   })
-  async register(@Body() registerBodyDto: RegisterBodyDto): Promise<LoginDto> {
-    return await this.authService.register(registerBodyDto);
+  async register(@Body() registerBodyDto: RegisterBodyDto): Promise<void> {
+    await this.authService.register(registerBodyDto);
   }
 
   @Public()
