@@ -8,6 +8,7 @@ import {
   EmailVerifyBodyDto,
   RegisterBodyDto,
   LoginDto,
+  LoginBodyDto,
 } from '../dtos';
 
 @Controller('admin/auth')
@@ -60,6 +61,7 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: '注册成功',
+    type: LoginDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -67,5 +69,21 @@ export class AuthController {
   })
   async register(@Body() registerBodyDto: RegisterBodyDto): Promise<LoginDto> {
     return await this.authService.register(registerBodyDto);
+  }
+
+  @Public()
+  @Post('login')
+  @ApiOperation({ summary: '登录' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '登录成功',
+    type: LoginDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: '登录失败, 请稍后重试',
+  })
+  async login(@Body() loginBodyDto: LoginBodyDto): Promise<LoginDto> {
+    return await this.authService.login(loginBodyDto);
   }
 }
