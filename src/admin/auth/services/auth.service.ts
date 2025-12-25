@@ -4,12 +4,13 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { RedisService } from '@/common/redis/redis.service';
+import { ConfigService } from '@nestjs/config';
 import { UserRepository } from '@/admin/user/repositories';
 import { EMAIL_VERIFY_PREFIX } from '@/common/constants';
+import { JwtService } from '@/common/jwt/jwt.service';
 import { hashPassword } from '@/utils';
-import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from '@/interface';
-import { RegisterBodyDto, LoginDto, TokenDto } from '../dtos';
+import { CaptchaService } from './captcha.service';
+import { RegisterBodyDto, LoginDto, CaptchaType } from '../dtos';
 
 @Injectable()
 export class AuthService {
@@ -23,11 +24,13 @@ export class AuthService {
    * 用户注册
    * @param registerBodyDto 注册信息
    */
-  async register(registerBodyDto: RegisterBodyDto): Promise<void> {
-    const { email, password, emailVerifyCode } = registerBodyDto;
+  async register(registerBodyDto: RegisterBodyDto): Promise<LoginDto> {
+    const { email, password, emailVerifyCode, code, captchaId } =
+      registerBodyDto;
 
     // 1. 验证邮箱验证码
     await this.verifyEmailCode(email, emailVerifyCode);
+    await this.verifyRegisterCaptcha(captchaId, code);
 
     // 2. 检查邮箱是否已注册
     const emailExists = await this.userRepository.existsByEmail(email);
@@ -42,6 +45,11 @@ export class AuthService {
     const user = await this.userRepository.create({
       email,
       password: hashedPassword,
+    });
+    const tokens = await this.jwtService.generateTokens({ sub: user.id });
+    return new LoginDto({
+      ...user,
+      ...tokens,
     });
   }
 
@@ -66,10 +74,25 @@ export class AuthService {
   }
 
   /**
-   * 生成Access Token和Refresh Token
+   * 验证注册验证码
+   * @param captchaId 验证码ID
+   * @param inputCode 输入的验证码
    */
-  // async generateTokens(userId: string): Promise<TokenDto> {
-  //   const payload: JwtPayload = { sub: userId };
-  //   const accessToken = this.jwtService.sign(payload, JWT_CONFIG.access);
-  // }
+  private async verifyRegisterCaptcha(
+    captchaId: string,
+    inputCode: string,
+  ): Promise<void> {
+    const captchaRedisKey = CaptchaService.createCaptchaRedisKey(
+      CaptchaType.REGISTER,
+      captchaId,
+    );
+    const storedCode = await this.redisService.get(captchaRedisKey);
+    if (!storedCode) {
+      throw new BadRequestException('注册验证码已过期，请重新获取');
+    }
+    if (!CaptchaService.isValidCaptcha(inputCode, storedCode)) {
+      throw new BadRequestException('注册验证码错误');
+    }
+    await this.redisService.del(captchaRedisKey);
+  }
 }

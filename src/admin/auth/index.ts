@@ -4,10 +4,12 @@ import { AuthController } from './controllers';
 import { AuthService, CaptchaService, EmailService } from './services';
 import { UserEntity } from '../user/entities';
 import { UserRepository } from '../user/repositories';
+import { JwtModule } from '@/common/jwt';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity])],
+  imports: [TypeOrmModule.forFeature([UserEntity]), JwtModule],
   controllers: [AuthController],
   providers: [AuthService, CaptchaService, EmailService, UserRepository],
+  exports: [AuthService],
 })
 export class AuthModule {}

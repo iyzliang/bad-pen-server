@@ -1,11 +1,13 @@
 import { Controller, Get, Post, Query, Body, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Public } from '@/common/jwt';
 import { AuthService, CaptchaService, EmailService } from '../services';
 import {
   CaptchaDto,
   CaptchaQueryDto,
   EmailVerifyBodyDto,
   RegisterBodyDto,
+  LoginDto,
 } from '../dtos';
 
 @Controller('admin/auth')
@@ -17,6 +19,7 @@ export class AuthController {
     private readonly emailService: EmailService,
   ) {}
 
+  @Public()
   @Get('captcha')
   @ApiOperation({ summary: '获取验证码' })
   @ApiResponse({
@@ -34,6 +37,7 @@ export class AuthController {
     return await this.captchaService.generateCaptcha(captchaQueryDto.type);
   }
 
+  @Public()
   @Post('email/verify')
   @ApiOperation({ summary: '发送邮箱验证码' })
   @ApiResponse({
@@ -50,6 +54,7 @@ export class AuthController {
     await this.emailService.sendEmailVerify(sendEmailVerifyDto);
   }
 
+  @Public()
   @Post('register')
   @ApiOperation({ summary: '注册' })
   @ApiResponse({
@@ -60,7 +65,7 @@ export class AuthController {
     status: HttpStatus.BAD_REQUEST,
     description: '注册失败, 请稍后重试',
   })
-  async register(@Body() registerBodyDto: RegisterBodyDto): Promise<void> {
-    await this.authService.register(registerBodyDto);
+  async register(@Body() registerBodyDto: RegisterBodyDto): Promise<LoginDto> {
+    return await this.authService.register(registerBodyDto);
   }
 }

@@ -12,6 +12,7 @@ export const createDatabaseConfig = (
   const sync = configService.get<string>('DB_SYNC') === 'true';
   const migrationsRun =
     configService.get<string>('DB_MIGRATIONS_RUN') === 'true';
+  const logging = configService.get<string>('DB_LOG') === 'true';
   const poolSize = configService.get<number>('DB_POOL_SIZE') ?? 10;
   const poolMin = configService.get<number>('DB_POOL_MIN') ?? 2;
 
@@ -29,7 +30,7 @@ export const createDatabaseConfig = (
     // 迁移文件路径
     migrations: [__dirname + '/../../migrations/*{.ts,.js}'],
     // 日志配置：debug 模式下输出 SQL 查询
-    logging: configService.get<string>('LOG_LEVEL') === 'debug',
+    logging,
     // 连接池配置
     extra: {
       max: poolSize, // 最大连接数
