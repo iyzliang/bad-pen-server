@@ -62,7 +62,7 @@ export class JwtService {
     });
   }
 
-  async generateTokens(payload: JwtPayload): Promise<TokenDto> {
+  generateTokens(payload: JwtPayload): TokenDto {
     const accessTokenDto = this.generateAccessToken(payload);
     const refreshTokenDto = this.generateRefreshToken(payload);
 
@@ -97,7 +97,7 @@ export class JwtService {
         throw new UnauthorizedException('刷新令牌无效');
       }
       return payload;
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('刷新令牌无效');
     }
   }

@@ -55,7 +55,7 @@ export class CosService {
   ): Promise<COS.PutObjectResult> {
     const cos = this.getCos();
     const cosConfig = this.getCosConfig();
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       cos.putObject(
         {
           Bucket: cosConfig.bucket,

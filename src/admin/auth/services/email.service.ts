@@ -16,14 +16,14 @@ export class EmailService {
     private readonly configService: ConfigService,
   ) {
     this.transporter = nodemailer.createTransport({
-      host: this.configService.get<string>('SMTP_HOST'),
-      port: this.configService.get<number>('SMTP_PORT'),
-      secure: this.configService.get<boolean>('SMTP_SECURE'),
+      host: this.configService.get<string>('SMTP_HOST') as string,
+      port: this.configService.get<number>('SMTP_PORT') as number,
+      secure: this.configService.get<boolean>('SMTP_SECURE') as boolean,
       auth: {
-        user: this.configService.get<string>('SMTP_USER'),
-        pass: this.configService.get<string>('SMTP_PASS'),
+        user: this.configService.get<string>('SMTP_USER') as string,
+        pass: this.configService.get<string>('SMTP_PASS') as string,
       },
-    });
+    }) as nodemailer.Transporter;
   }
 
   async sendEmailVerify(emailVerifyBodyDto: EmailVerifyBodyDto): Promise<void> {
@@ -53,7 +53,7 @@ export class EmailService {
       );
       // 发送验证码邮件
       await this.sendVerificationEmail(email, verifyCode, EMAIL_VERIFY_TTL);
-    } catch (error) {
+    } catch {
       throw new BadRequestException('发送邮箱验证码失败, 请稍后重试');
     }
   }
@@ -168,10 +168,6 @@ export class EmailService {
 </html>
       `,
     };
-    try {
-      await this.transporter.sendMail(mailOptions);
-    } catch (error) {
-      throw error;
-    }
+    await this.transporter.sendMail(mailOptions);
   }
 }

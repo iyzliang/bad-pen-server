@@ -42,7 +42,7 @@ export class CaptchaService {
         captchaId,
         captchaUrl: dataUrl,
       };
-    } catch (error) {
+    } catch {
       throw new BadRequestException('获取验证码失败');
     }
   }

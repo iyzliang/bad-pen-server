@@ -31,8 +31,8 @@ export class UserController {
     description: '获取用户信息成功',
     type: UserInfoDto,
   })
-  async getUserInfo(@CurrentUser() user: UserEntity): Promise<UserInfoDto> {
-    return await this.userService.getUserInfo(user);
+  getUserInfo(@CurrentUser() user: UserEntity): UserInfoDto {
+    return this.userService.getUserInfo(user);
   }
 
   @UseGuards(JwtAuthGuard)

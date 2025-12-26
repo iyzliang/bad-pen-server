@@ -23,7 +23,6 @@ import { AssetService } from '../services';
 import { FileValidationPipe } from '../pipes';
 import {
   AssetImageDto,
-  AssetImageItemDto,
   AssetImageListQueryDto,
   AssetImageListDto,
 } from '../dtos';
