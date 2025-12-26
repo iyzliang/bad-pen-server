@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { AssetEntity } from '../../asset/entities';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -28,6 +30,9 @@ export class UserEntity {
 
   @Column({ type: 'timestamp with time zone', nullable: true })
   lastPasswordUpdatedAt: Date;
+
+  @OneToMany(() => AssetEntity, (asset) => asset.user)
+  assets: AssetEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

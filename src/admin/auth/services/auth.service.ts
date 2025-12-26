@@ -84,7 +84,9 @@ export class AuthService {
   ): Promise<AccessTokenDto> {
     const { refreshToken } = refreshTokenBodyDto;
     const payload = await this.jwtService.verifyRefreshToken(refreshToken);
-    const accessTokenDto = this.jwtService.generateAccessToken(payload);
+    const accessTokenDto = this.jwtService.generateAccessToken({
+      sub: payload.sub,
+    });
     return new AccessTokenDto({
       ...accessTokenDto,
     });

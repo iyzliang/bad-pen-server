@@ -80,22 +80,25 @@ export class JwtService {
     if (!refreshSecret) {
       throw new Error('JWT_SECRET 或 JWT_REFRESH_SECRET 未配置');
     }
-
-    const payload = this.jwtService.verify<JwtPayload>(token, {
-      secret: refreshSecret,
-    });
-    if (!payload) {
+    try {
+      const payload = this.jwtService.verify<JwtPayload>(token, {
+        secret: refreshSecret,
+      });
+      if (!payload) {
+        throw new UnauthorizedException('刷新令牌无效');
+      }
+      const refreshTokenRedisKey = `${JWT_REFRESH_REDIS_PREFIX}:${payload.sub}`;
+      const storedRefreshToken =
+        await this.redisService.get(refreshTokenRedisKey);
+      if (!storedRefreshToken) {
+        throw new UnauthorizedException('刷新令牌已过期');
+      }
+      if (storedRefreshToken !== token) {
+        throw new UnauthorizedException('刷新令牌无效');
+      }
+      return payload;
+    } catch (error) {
       throw new UnauthorizedException('刷新令牌无效');
     }
-    const refreshTokenRedisKey = `${JWT_REFRESH_REDIS_PREFIX}:${payload.sub}`;
-    const storedRefreshToken =
-      await this.redisService.get(refreshTokenRedisKey);
-    if (!storedRefreshToken) {
-      throw new UnauthorizedException('刷新令牌已过期');
-    }
-    if (storedRefreshToken !== token) {
-      throw new UnauthorizedException('刷新令牌无效');
-    }
-    return payload;
   }
 }
