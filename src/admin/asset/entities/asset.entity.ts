@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import { UserEntity } from '../../user/entities';
 
@@ -29,4 +30,10 @@ export class AssetEntity {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @DeleteDateColumn({
+    nullable: true,
+    comment: '软删除时间',
+  })
+  deletedAt: Date | null;
 }

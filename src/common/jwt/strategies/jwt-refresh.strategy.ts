@@ -28,4 +28,3 @@ export class JwtRefreshStrategy extends PassportStrategy(
     return { userId: payload.sub };
   }
 }
-
