@@ -37,7 +37,7 @@ export class ResponseInterceptor implements NestInterceptor {
         const statusCode = response.statusCode || HttpStatus.OK;
 
         // 构造响应对象
-        const responseData: IResponse = {
+        const responseData: IResponse<any> = {
           code: statusCode,
           message: 'ok',
           time: formatDateTime(),

@@ -3,10 +3,13 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToMany,
   CreateDateColumn,
   DeleteDateColumn,
+  JoinColumn,
 } from 'typeorm';
-import { UserEntity } from '../../user/entities';
+import { UserEntity } from '@/admin/user/entities';
+import { ArticleEntity } from '@/admin/article/entities';
 
 @Entity('assets')
 export class AssetEntity {
@@ -26,7 +29,11 @@ export class AssetEntity {
   size: number; // 文件大小 (bytes)
 
   @ManyToOne(() => UserEntity, (user) => user.assets)
+  @JoinColumn({ name: 'userId' })
   user: UserEntity;
+
+  @OneToMany(() => ArticleEntity, (article) => article.cover)
+  articles: ArticleEntity[];
 
   @CreateDateColumn()
   createdAt: Date;
