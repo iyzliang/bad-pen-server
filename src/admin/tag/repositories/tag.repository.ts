@@ -28,7 +28,7 @@ export class TagRepository {
       .createQueryBuilder('tag')
       .where('tag.name = :name', { name })
       .andWhere('tag.userId = :userId', { userId: user.id })
-      .andWhere('folder.deletedAt IS NULL')
+      .andWhere('tag.deletedAt IS NULL')
       .getOne();
   }
 

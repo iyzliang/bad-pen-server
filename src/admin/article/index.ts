@@ -3,7 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { ArticleEntity } from './entities';
 import { ArticleController } from './controllers';
-import { ArticleService } from './services';
+import {
+  ArticleService,
+  ArticleSchedulerService,
+} from './services';
 import { ArticleRepository } from './repositories';
 import { AssetRepository } from '@/admin/asset/repositories';
 import { TagRepository } from '@/admin/tag/repositories';
@@ -16,6 +19,12 @@ import { TagEntity } from '@/admin/tag/entities';
     JwtModule,
   ],
   controllers: [ArticleController],
-  providers: [ArticleService, ArticleRepository, AssetRepository, TagRepository],
+  providers: [
+    ArticleService,
+    ArticleSchedulerService,
+    ArticleRepository,
+    AssetRepository,
+    TagRepository,
+  ],
 })
 export class ArticleModule {}

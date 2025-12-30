@@ -14,6 +14,7 @@ export class AssetImageDto {
   url: string;
 
   constructor(asset: AssetEntity) {
-    Object.assign(this, asset);
+    this.id = asset.id;
+    this.url = asset.url;
   }
 }

@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { TagItemDto } from '@/admin/tag/dtos/tag-item.dto';
 import { TagEntity } from '@/admin/tag/entities';
-import { formatDateTime } from '@/utils/date.util';
+import { formatDateTime, removeMarkdownTag } from '@/utils';
 import { ArticleStatus, ArticleEntity } from '../entities';
 
 export class ArticleItemDto {
@@ -45,7 +45,7 @@ export class ArticleItemDto {
   constructor(articleEntity: ArticleEntity) {
     this.id = articleEntity.id;
     this.title = articleEntity.title;
-    this.content = articleEntity.content;
+    this.content = removeMarkdownTag(articleEntity.content);
     this.tags = articleEntity.tags.map((tag: TagEntity) => new TagItemDto(tag));
     this.createdAt = formatDateTime(articleEntity.createdAt);
     this.status = articleEntity.status;
