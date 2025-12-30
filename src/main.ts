@@ -63,6 +63,10 @@ async function bootstrap() {
   SwaggerModule.setup(swaggerPrefix, app, document); // 通过 http://localhost:3010/api 访问 Swagger UI
 
   await app.listen(port);
-  winstonLogger.log(`🚀 ${appName} 已启动: http://localhost:${port}${prefix}`);
+  if (winstonLogger && typeof winstonLogger.log === 'function') {
+    winstonLogger.log(
+      `🚀 ${appName} 已启动: http://localhost:${port}${prefix}`,
+    );
+  }
 }
 bootstrap();

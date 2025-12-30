@@ -21,17 +21,23 @@ export class ResponseInterceptor implements NestInterceptor {
     const response = ctx.getResponse<Response>();
 
     return next.handle().pipe(
-      map((data) => {
+      map((data: unknown) => {
         // 如果是已封装响应体，直接返回
-        if (data?.hasOwnProperty('code') && data?.hasOwnProperty('data')) {
-          return data;
+        const dataObj = data as Record<string, unknown> | null | undefined;
+        if (
+          dataObj &&
+          typeof dataObj === 'object' &&
+          'code' in dataObj &&
+          'data' in dataObj
+        ) {
+          return data as IResponse;
         }
 
         // 获取 HTTP 状态码，默认为 200
         const statusCode = response.statusCode || HttpStatus.OK;
 
         // 构造响应对象
-        const responseData: IResponse = {
+        const responseData: IResponse<any> = {
           code: statusCode,
           message: 'ok',
           time: formatDateTime(),

@@ -4,7 +4,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { AssetEntity } from '@/admin/asset/entities';
+import { ArticleEntity } from '@/admin/article/entities';
+import { TagEntity } from '@/admin/tag/entities';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -28,6 +32,15 @@ export class UserEntity {
 
   @Column({ type: 'timestamp with time zone', nullable: true })
   lastPasswordUpdatedAt: Date;
+
+  @OneToMany(() => AssetEntity, (asset) => asset.user)
+  assets: AssetEntity[];
+
+  @OneToMany(() => TagEntity, (tag) => tag.user)
+  tags: TagEntity[];
+
+  @OneToMany(() => ArticleEntity, (article) => article.user)
+  articles: ArticleEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

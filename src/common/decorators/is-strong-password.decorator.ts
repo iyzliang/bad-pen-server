@@ -20,7 +20,7 @@ export class IsStrongPasswordConstraint implements ValidatorConstraintInterface 
    */
   private readonly allowedSpecialChars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
 
-  validate(value: any, args: ValidationArguments): boolean {
+  validate(value: unknown): boolean {
     if (typeof value !== 'string') {
       return false;
     }
@@ -53,7 +53,7 @@ export class IsStrongPasswordConstraint implements ValidatorConstraintInterface 
   }
 
   defaultMessage(args: ValidationArguments): string {
-    const value = args.value;
+    const value = args.value as unknown;
 
     if (typeof value !== 'string') {
       return '密码必须是字符串';

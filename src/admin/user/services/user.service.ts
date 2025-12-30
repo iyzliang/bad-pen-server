@@ -12,7 +12,7 @@ import { UserInfoDto, UserUpdateBodyDto, UserPasswordBodyDto } from '../dtos';
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async getUserInfo(userEntity: UserEntity): Promise<UserInfoDto> {
+  getUserInfo(userEntity: UserEntity): UserInfoDto {
     return new UserInfoDto(userEntity);
   }
 

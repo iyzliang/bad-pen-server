@@ -68,7 +68,7 @@ export class AuthService {
     if (!comparePassword(password, user.password)) {
       throw new BadRequestException('密码错误');
     }
-    const tokens = await this.jwtService.generateTokens({ sub: user.id });
+    const tokens = this.jwtService.generateTokens({ sub: user.id });
     return new LoginDto({
       ...user,
       ...tokens,
@@ -84,7 +84,9 @@ export class AuthService {
   ): Promise<AccessTokenDto> {
     const { refreshToken } = refreshTokenBodyDto;
     const payload = await this.jwtService.verifyRefreshToken(refreshToken);
-    const accessTokenDto = this.jwtService.generateAccessToken(payload);
+    const accessTokenDto = this.jwtService.generateAccessToken({
+      sub: payload.sub,
+    });
     return new AccessTokenDto({
       ...accessTokenDto,
     });

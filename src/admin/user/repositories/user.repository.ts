@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UserEntity } from '../entities';
 
 /**
@@ -76,13 +76,6 @@ export class UserRepository {
    */
   async update(id: string, userData: Partial<UserEntity>): Promise<void> {
     await this.repository.update(id, userData);
-  }
-
-  /**
-   * 删除用户
-   */
-  async delete(id: string): Promise<void> {
-    await this.repository.delete(id);
   }
 
   /**

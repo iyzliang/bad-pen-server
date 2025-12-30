@@ -43,14 +43,16 @@ export class BadRequestFilter<T> implements ExceptionFilter {
         exceptionResponse !== null
       ) {
         // 对象类型：尝试获取 message 字段（手动抛出的异常消息）
-        const responseObj = exceptionResponse as any;
-        manualMessage = responseObj.message;
+        const responseObj = exceptionResponse as {
+          message?: string | string[];
+        };
+        const messageValue = responseObj.message;
 
         // 如果 message 是数组，取第一个元素
-        if (Array.isArray(manualMessage)) {
-          manualMessage = manualMessage[0]?.trim() || undefined;
-        } else if (typeof manualMessage === 'string') {
-          manualMessage = manualMessage.trim() || undefined;
+        if (Array.isArray(messageValue)) {
+          manualMessage = messageValue[0]?.trim() || undefined;
+        } else if (typeof messageValue === 'string') {
+          manualMessage = messageValue.trim() || undefined;
         } else {
           manualMessage = undefined;
         }

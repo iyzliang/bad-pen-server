@@ -7,8 +7,8 @@ import 'winston-daily-rotate-file';
 export const createLoggerConfig = (
   configService: ConfigService,
 ): WinstonModuleOptions => {
-  const logLevel = configService.get('LOG_LEVEL') ?? 'info';
-  const logDir = configService.get('LOG_DIR') ?? 'logs';
+  const logLevel = (configService.get('LOG_LEVEL') as string) ?? 'info';
+  const logDir = (configService.get('LOG_DIR') as string) ?? 'logs';
   const logOn = configService.get('LOG_ON') === 'true';
 
   // 控制台日志格式
@@ -16,9 +16,9 @@ export const createLoggerConfig = (
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.colorize({ all: true }),
     winston.format.printf(({ timestamp, level, message, context, trace }) => {
-      const contextStr = context ? `[${context}]` : '';
-      const traceStr = trace ? `\n${trace}` : '';
-      return `${timestamp} ${level} ${contextStr} ${message}${traceStr}`;
+      const contextStr = context ? `[${String(context)}]` : '';
+      const traceStr = trace ? `\n${String(trace)}` : '';
+      return `${String(timestamp)} ${String(level)} ${contextStr} ${String(message)}${traceStr}`;
     }),
   );
 
@@ -39,7 +39,7 @@ export const createLoggerConfig = (
       maxFiles: LOG_MAX_FILES,
       level: 'error',
       format: fileFormat,
-    }),
+    }) as winston.transport,
     // 所有日志文件
     new winston.transports.DailyRotateFile({
       dirname: logDir,
@@ -49,7 +49,7 @@ export const createLoggerConfig = (
       maxFiles: LOG_MAX_FILES,
       level: 'info',
       format: fileFormat,
-    }),
+    }) as winston.transport,
   ];
 
   if (logOn) {
@@ -58,7 +58,7 @@ export const createLoggerConfig = (
       new winston.transports.Console({
         level: logLevel,
         format: consoleFormat,
-      }),
+      }) as winston.transport,
     );
   }
 
@@ -71,14 +71,14 @@ export const createLoggerConfig = (
       new winston.transports.DailyRotateFile({
         filename: `${logDir}/exceptions.log`,
         format: fileFormat,
-      }),
+      }) as winston.transport,
     ],
     // 拒绝处理（处理被拒绝的 Promise）
     rejectionHandlers: [
       new winston.transports.DailyRotateFile({
         filename: `${logDir}/rejections.log`,
         format: fileFormat,
-      }),
+      }) as winston.transport,
     ],
   };
 };

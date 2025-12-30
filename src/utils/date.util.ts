@@ -8,4 +8,3 @@ import dayjs from 'dayjs';
 export function formatDateTime(date?: Date | string | number): string {
   return dayjs(date).format('YYYY-MM-DD HH:mm:ss');
 }
-
